@@ -168,33 +168,10 @@ def show_exam_result(request, course_id, submission_id):
     course = get_object_or_404(Course, pk=course_id)
     submission = get_object_or_404(Submission, pk=submission_id)
 
-    total_score = 0
-
-    choices = submission.choices.all()
-
-    for question in course.question_set.all():
-
-        selected_choices = choices.filter(question=question)
-
-        all_correct = True
-
-        # Correct answers
-        for choice in question.choice_set.filter(is_correct=True):
-            if choice not in selected_choices:
-                all_correct = False
-
-        # Wrong answers selected
-        for choice in selected_choices:
-            if not choice.is_correct:
-                all_correct = False
-
-        if all_correct:
-            total_score += question.grade
-
     context = {
         'course': course,
         'submission': submission,
-        'score': total_score,
+        'score': submission.get_score(),
         'total_score': course.total_score,
     }
 
